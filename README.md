@@ -1,9 +1,18 @@
 # Phoscon Daylight schedule updater
 
-[Phoscon](https://phoscon.de/en/conbee2/) is the name of the fantastic Zigbee home automation solution using hardware such as the deCONZ ConBee II. Along with a standalone configuration interface, there is even a REST API provided with [documentation here](https://dresden-elektronik.github.io/deconz-rest-doc/)
+[Phoscon](https://phoscon.de/en/conbee2/) is the name of the fantastic Zigbee
+home automation solution using hardware such as the deCONZ ConBee II. Along with
+a standalone web-based configuration interface, there is even a REST API
+provided with [documentation here](https://dresden-elektronik.github.io/deconz-rest-doc/)
 
 ## Background
-While the deCONZ config pages do pretty much everything I want, one feature I needed was to be able to program a schedule to use the inbuilt Daylight virtual sensor (so my perimeter lights would come on at sunset, and go off at sunrise). This feature is not currently supported in the Phoscon app, so I wrote a small daemon that would fetch the sunrise and sunset times based from a given location and then update the REST API if they are updated.
+While the deCONZ config pages do pretty much everything I want, one feature
+I needed was to be able to program schedules using the inbuilt Daylight virtual
+sensor to control my perimeter lights so they would come on at sunset, and
+turn off at sunrise. This feature is not currently supported in the Phoscon
+app, so I wrote this small daemon that fetches the sunrise and sunset times
+based off a given location and then update the schedules in the deCONZ REST
+API if the sun hours have changed.
 
 ## Prerequisites
 - GLib/GIO
@@ -21,14 +30,24 @@ ninja -C build
 ```
 
 ## Obtaining an API key
-The deCONZ REST API requires each request contain a valid API key. This must be obtained by first unlocking the gateway, and then you can use curl to POST a request using the **api_req_key.json** file in this repo:
+The deCONZ REST API requires each request contain a valid API key. This must
+be obtained by first unlocking the deCONZ gateway, and then you can use curl
+to POST a request using the **api_req_key.json** file in this repo:
 
-`curl http://<gateway_host>:8088/api/ -d @../api_key_req.json | jq `
+`curl http://<gateway_host>:8088/api/ -d @api_key_req.json | jq `
+
+(jq is optional and just used for pretty JSON formatting)
 
 ## Configuration file
-Nearly the entirety of the configuration is contained within one file. There is a commented sample file included in this repository,  adjust it with your values.
+Nearly the entirety of the configuration is contained within one file. There
+is a commented sample file included in this repository which should be
+updated with your values.
 
-My suggestion is to create the schedules you want for Sunrise and Sunset first using the Phoscon web client and then run this binary with an empty [schedules} section. It will then print out all schedules along with the corresponding ID which can then be used in the configuration file:
+My suggestion is to create the schedules you want for Sunrise and Sunset
+first using the Phoscon web client and then run this binary with an empty
+[schedules] section. It will then print out all schedules along with the
+corresponding ID (e.g. Schedule **[2]** which can then be used in the
+configuration file:
 ```
 >./build/phoscon-sunmon -c sample.cfg
 ** Message: 22:56:56.762: Parsed 3 key(s) from group 'phoscon'
@@ -46,11 +65,18 @@ My suggestion is to create the schedules you want for Sunrise and Sunset first u
 ```
 In this case the sunset ID is 3 and the sunrise ID is 2.
 
-### Why is written in C and not <insert your choice of Go/Python/Rust/Java/Bash>?
-Mainly because I like C.  Even though it's arguably more code than say, a Python file, there are many useful libraries available that make it programming in C quite manageable.  Then there is the added advantage of portability and light-weight.
+### Why is this written in C and not <insert your choice of Go/Python/Rust/Java/Bash>?
+Mainly because I like C. Even though it's arguably more code than say, a
+Python program, there are many useful libraries available that make programming
+in C quite manageable. Not to mention the added advantage of portability
+and a small footprint.
 
 # Attributions
-The API for providing the sunrise and sunset times is [Sunrise Sunset](https://sunrise-sunset.org/api)
-Please show respect for a useful free-of-charge service by setting the poll period to a sensible period (e.g once every 8 hours /  28800 seconds)
+The API for providing the sunrise and sunset times is
+[Sunrise Sunset](https://sunrise-sunset.org/api)
+Please show respect for a useful free-of-charge service by setting the poll
+period to a sensible period (e.g once every 8 hours /  28800 seconds)
 
-Also to Discord users @Mimiix and @Swoop in #deCONZ for the idea of using the REST API.
+Also to Discord users @Mimiix and @Swoop in #deCONZ for the idea of using
+the REST API instead of my original plan to write directly to the
+SQLite database :)
