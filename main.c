@@ -201,7 +201,8 @@ usage(const gchar *errstr, gint exit_code)
   g_printerr("\nUsage: %s [options] -c <cfg_file>\n"
              "Options:\n"
              "  --config   -c     Configuration file to parse\n"
-             "  --help    -h      Show help options\n\n",
+             "  --once     -o     Fetch and update once, then exit\n"
+             "  --help     -h     Show help options\n\n",
              prog_name);
   exit(exit_code);
 }
@@ -213,22 +214,27 @@ main(gint argc, gchar **argv)
   struct prog_state state = { 0, };
   struct prog_cfg *cfg = &state.cfg;
   gchar *cfgfile = NULL;
+  gboolean one_shot = FALSE;
   gint retval = EXIT_FAILURE;
   gint opt;
 
   static const struct option opts[] = {
     { "help",   no_argument,        NULL, 'h' },
     { "config", required_argument,  NULL, 'c' },
-    { NULL,    0,                   NULL,  0 }
+    { "once",   no_argument,        NULL, 'o' },
+    { NULL,    0,                   NULL,  0  }
   };
 
-  while ((opt = getopt_long(argc, argv, "hc:", opts, NULL)) != -1) {
+  while ((opt = getopt_long(argc, argv, "hc:o", opts, NULL)) != -1) {
     switch (opt) {
     case 'h':
       usage(NULL, EXIT_SUCCESS);
       break;
     case 'c':
       cfgfile = optarg;
+      break;
+    case 'o':
+      one_shot = TRUE;
       break;
     default:
       usage("Illegal argument", EXIT_FAILURE);
@@ -260,16 +266,21 @@ main(gint argc, gchar **argv)
     goto out;
   }
 
-  g_message("Sunrise/sunset poll period is %u seconds",
-            cfg->poll_period_secs);
-
-
   /* Perform initial update before doing the periodic ones */
   if (!fetch_and_update_sun_times(&state, &err)) {
     g_printerr("Perform initial update failed: %s\n", GERROR_MSG(err));
     goto out;
   }
 
+  if (one_shot) {
+    /* We are doneskys */
+    g_message("One-shot mode, exit with success code");
+    retval = EXIT_SUCCESS;
+    goto out;
+  }
+
+  g_message("Sunrise/sunset poll period is %u seconds",
+            cfg->poll_period_secs);
   state.poll_src_id = g_timeout_add_seconds(cfg->poll_period_secs,
                                             handle_poll_timeout, &state);
   g_unix_signal_add(SIGINT, handle_sigint, &state);
