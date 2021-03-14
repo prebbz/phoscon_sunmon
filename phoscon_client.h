@@ -30,6 +30,9 @@ phoscon_client_release(void);
 const struct phoscon_schedule_ent *
 phoscon_client_lookup_schedule(gint id);
 
+gint
+phoscon_client_list_all_schedules(GList **results);
+
 gboolean
 phoscon_client_update_schedule_time(gint id, GDateTime *utc, GError **err);
 

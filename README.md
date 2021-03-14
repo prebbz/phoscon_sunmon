@@ -18,7 +18,7 @@ API if the sun hours have changed.
 - GLib/GIO
 - libjansson
 - libCURL
-- MESON (Ninja)
+- Meson (Ninja)
 
 ## Building the binary
 Clone the repository and after ensuring you have all the pre-reqs run:
@@ -43,25 +43,27 @@ Nearly the entirety of the configuration is contained within one file. There
 is a commented sample file included in this repository which should be
 updated with your values.
 
-My suggestion is to create the schedules you want for Sunrise and Sunset
-first using the Phoscon web client and then run this binary with an empty
-[schedules] section. It will then print out all schedules along with the
-corresponding ID (e.g. Schedule **[2]** which can then be used in the
-configuration file:
+To find out the currently defined schedules, you can run this binary with the
+the -l option which will list all the schedules and their IDs (which can
+then be copied into the config file):
 ```
->./build/phoscon-sunmon -c sample.cfg
-** Message: 22:56:56.762: Parsed 3 key(s) from group 'phoscon'
-** Message: 22:56:56.762: Parsed 3 key(s) from group 'general'
-** Message: 22:56:56.762: Parsed 2 key(s) from group 'schedules'
-** Message: 22:56:56.762: Parsed 3 group(s) from config file 'sample.cfg'
-** Message: 22:56:57.405: Sunrise/Sunset client initialised with location lat=55.1035667 long=17.933340
-** Message: 22:56:57.405: Attribution of API to sunrise-sunset.org
-** Message: 22:56:57.406: Initial sunrise time (UTC): 06:31:22
-** Message: 22:56:57.406: Initial sunset time (UTC) : 15:10:30
-** Message: 22:56:57.409: Schedule [2] 'MorningSun' Created: 2020-11-03  16:32:43 Status: enabled Time: W127/T06:31:22 (Local: W127/T07:31:22)
-** Message: 22:56:57.409: Schedule [3] 'EveningSunset' Created: 2020-11-03  16:34:07 Status: enabled Time: W127/T15:10:30 (Local: W127/T16:10:30)
-** Message: 22:56:57.409: Phoscon simple client initialised, found 2 schedules
-** Message: 22:56:57.409: Sunrise/sunset poll period is 3600 seconds
+>./build/phoscon-sunmon -c sample.cfg -l
+** Message: 15:44:57.761: Parsed 3 group(s) from config file 'sample.cfg'
+** Message: 15:44:57.767: Schedule [2] 'MorningSun' Created: 2020-11-03  16:32:43 Status: enabled Time: W127/T05:22:32 (Local: W127/T06:22:32)
+** Message: 15:44:57.767: Schedule [4] 'EveningSunset' Created: 2020-11-27  15:10:40 Status: enabled Time: W127/T17:09:31 (Local: W127/T18:09:31)
+** Message: 15:44:57.768: Schedule [8] 'ShoeMoodOff' Created: 2021-01-02  17:15:40 Status: enabled Time: W127/T22:00:00 (Local: W127/T23:00:00)
+** Message: 15:44:57.768: Schedule [9] 'ShoeMoodOn' Created: 2021-01-02  17:17:40 Status: enabled Time: W127/T17:09:31 (Local: W127/T18:09:31)
+** Message: 15:44:57.768: Phoscon simple client initialised, found 4 schedules
+** Message: 15:44:57.768: Phoscon schedule list (4 entries)
++-----+--------------------+------------+---------------------+-------------------+
+| ID  | Name               | Status     | Created             | Schedule (local)  |
++-----+--------------------+------------+---------------------+-------------------+
+| 008 | ShoeMoodOff        | enabled    | 2021-01-02 17:15:40 | W127/T23:00:00    |
+| 002 | MorningSun         | enabled    | 2020-11-03 16:32:43 | W127/T06:22:32    |
+| 009 | ShoeMoodOn         | enabled    | 2021-01-02 17:17:40 | W127/T18:09:31    |
+| 004 | EveningSunset      | enabled    | 2020-11-27 15:10:40 | W127/T18:09:31    |
++-----+--------------------+------------+---------------------+-------------------+
+
 ```
 In this case the sunset ID is 3 and the sunrise ID is 2.
 

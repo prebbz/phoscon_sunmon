@@ -373,6 +373,33 @@ phoscon_client_lookup_schedule(gint id)
   return g_hash_table_lookup(pc->schedules, &id);
 }
 
+gint
+phoscon_client_list_all_schedules(GList **results)
+{
+  GList *res = NULL;
+  phoscon_client_t *pc = pclient;
+  GHashTableIter iter;
+  gpointer key;
+  gpointer value;
+  gint i;
+
+  g_return_val_if_fail(pc != NULL, -1);
+
+  if (!results) {
+    /* If the caller just wants the count .. */
+    return g_hash_table_size(pc->schedules);
+  }
+
+  g_hash_table_iter_init(&iter, pc->schedules);
+  for (i = 0; g_hash_table_iter_next(&iter, &key, &value); i++) {
+    res = g_list_prepend(res, value);
+  }
+
+  *results = g_list_reverse(res);
+
+  return i;
+}
+
 gboolean
 phoscon_client_update_schedule_time(gint id, GDateTime *utc, GError **err)
 {

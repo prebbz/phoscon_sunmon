@@ -40,6 +40,12 @@ parse_config_group(GKeyFile *kf, struct cfg_group *grp, GError **err)
         *sptr = g_key_file_get_string(kf, grpname, d->key, &lerr);
         break;
       }
+      case CFG_TYPE_VALUE: {
+        gchar **sptr = (gchar **) ptr;
+
+        *sptr = g_key_file_get_value(kf, grpname, d->key, &lerr);
+        break;
+      }
       case CFG_TYPE_BOOLEAN: {
         gboolean *b = (gboolean *) ptr;
 
@@ -71,7 +77,7 @@ parse_config_group(GKeyFile *kf, struct cfg_group *grp, GError **err)
     parsed++;
   }
 
-  g_message("Parsed %d key(s) from group '%s'", parsed, grpname);
+  g_debug("Parsed %d key(s) from group '%s'", parsed, grpname);
 
   return TRUE;
 }

@@ -11,6 +11,7 @@ enum cfg_ent_type {
   CFG_TYPE_STRING,
   CFG_TYPE_BOOLEAN,
   CFG_TYPE_DOUBLE,
+  CFG_TYPE_VALUE,
   CFG_TYPE_LAST,
 };
 
